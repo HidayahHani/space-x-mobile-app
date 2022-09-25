@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Button,
-  Pressable,
-  Alert,
-  TextInput,
-  SectionList,
-} from "react-native";
+import { View, Text, Button, Pressable, Alert } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useQuery } from "@apollo/client";
 import { GET_ROCKETS } from "../../gql/Query";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { FilterList } from "../../components";
 
 type RootStackParamList = {
   Home: undefined;
@@ -58,47 +50,6 @@ const Home = ({ navigation }: HomeProps) => {
   //     console.log(filteredRockets);
   //   };
 
-  const FILTER_DATA = [
-    {
-      title: "Country",
-      data: ["United States", "Republic of the Marshall Islands", "UK", "Rusa"],
-    },
-    {
-      title: "Company",
-      data: ["spaceX", "spaceY", "spaceZ"],
-    },
-  ];
-
-  const Item = ({ title, item }) => (
-    <View>
-      <Pressable
-        onPress={(x) => {
-          const filters = selectedFilters.map((selectedFilter) =>
-            selectedFilter.title !== title
-              ? selectedFilter
-              : { ...selectedFilter, data: [...selectedFilter.data, item] }
-          );
-          setSelectedFilters(filters);
-        }}
-      >
-        <Text>{item}</Text>
-      </Pressable>
-    </View>
-  );
-
-  const renderFilters = () => (
-    <SafeAreaView>
-      <SectionList
-        sections={FILTER_DATA}
-        keyExtractor={(item, index) => item + index}
-        renderItem={({ section: { title }, item }) => (
-          <Item item={item} title={title} />
-        )}
-        renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
-      />
-    </SafeAreaView>
-  );
-
   return (
     <View>
       {/* <TextInput
@@ -111,7 +62,12 @@ const Home = ({ navigation }: HomeProps) => {
         title="Filter"
         onPress={() => setIsRenderFilters(!isRenderFilters)}
       />
-      {isRenderFilters && renderFilters()}
+      {isRenderFilters && (
+        <FilterList
+          selectedFilters={selectedFilters}
+          setSelectedFilters={setSelectedFilters}
+        />
+      )}
 
       <Text>{"\n"}</Text>
 
