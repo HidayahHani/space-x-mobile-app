@@ -52,14 +52,19 @@ const Home = ({ navigation }: HomeProps) => {
       (selectedFilter) => selectedFilter.title === "Company"
     )[0].data;
 
-    const filteredRockets = rockets
-      .filter((rocket) =>
-        countries.length ? countries.includes(rocket.country) : rocket
-      )
-      .filter((rocket) =>
-        companies.length ? companies.includes(rocket.company) : rocket
-      );
+    const filteredRockets =
+      data &&
+      data.rockets &&
+      data.rockets
+        .filter((rocket) =>
+          countries.length ? countries.includes(rocket.country) : rocket
+        )
+        .filter((rocket) =>
+          companies.length ? companies.includes(rocket.company) : rocket
+        );
 
+    console.log({ countries, companies });
+    console.log(filteredRockets);
     setRockets(filteredRockets);
   }, [selectedFilters]);
 
@@ -107,19 +112,20 @@ const Home = ({ navigation }: HomeProps) => {
         ))}
 
       <Text>{"\n"}</Text>
-      {rockets.map((rocket) => (
-        <View key={rocket.id}>
-          <Pressable
-            onPress={() => navigation.navigate("Detail", { id: rocket.id })}
-          >
-            <Text>Name: {rocket.name}</Text>
-          </Pressable>
+      {rockets &&
+        rockets.map((rocket) => (
+          <View key={rocket.id}>
+            <Pressable
+              onPress={() => navigation.navigate("Detail", { id: rocket.id })}
+            >
+              <Text>Name: {rocket.name}</Text>
+            </Pressable>
 
-          <Text>Company: {rocket.company}</Text>
-          <Text>Country: {rocket.country}</Text>
-          <Text>{"\n"}</Text>
-        </View>
-      ))}
+            <Text>Company: {rocket.company}</Text>
+            <Text>Country: {rocket.country}</Text>
+            <Text>{"\n"}</Text>
+          </View>
+        ))}
     </View>
   );
 };

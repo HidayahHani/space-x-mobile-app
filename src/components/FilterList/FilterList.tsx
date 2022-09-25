@@ -24,8 +24,14 @@ const FilterList = (props) => {
             const filters = selectedFilters.map((selectedFilter) =>
               selectedFilter.title !== title
                 ? selectedFilter
-                : { ...selectedFilter, data: [...selectedFilter.data, item] }
+                : {
+                    ...selectedFilter,
+                    data: selectedFilter.data.includes(item)
+                      ? [...selectedFilter.data].filter((data) => data !== item)
+                      : [...selectedFilter.data, item],
+                  }
             );
+
             setSelectedFilters(filters);
           }}
         >
