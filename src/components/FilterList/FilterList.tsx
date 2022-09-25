@@ -9,7 +9,7 @@ const FILTER_DATA = [
   },
   {
     title: "Company",
-    data: ["spaceX", "spaceY", "spaceZ"],
+    data: ["SpaceX", "SpaceY", "SpaceZ"],
   },
 ];
 

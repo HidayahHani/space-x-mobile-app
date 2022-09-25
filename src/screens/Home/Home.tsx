@@ -13,8 +13,7 @@ type RootStackParamList = {
 type HomeProps = StackScreenProps<RootStackParamList, "Home">;
 
 const Home = ({ navigation }: HomeProps) => {
-  const [filteredRockets, setFilteredRockets] = useState(null);
-  const { data, error, loading } = useQuery(GET_ROCKETS);
+  const [rockets, setRockets] = useState([]);
   const [isRenderFilters, setIsRenderFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState([
     {
@@ -27,6 +26,8 @@ const Home = ({ navigation }: HomeProps) => {
     },
   ]);
 
+  const { data, error, loading } = useQuery(GET_ROCKETS);
+
   useEffect(() => {
     console.log("home screen reloads");
     AlertMessage();
@@ -34,6 +35,33 @@ const Home = ({ navigation }: HomeProps) => {
 
   const AlertMessage = () =>
     Alert.alert("First Time Alert", "First Time Landing on Home Screen");
+
+  useEffect(() => {
+    if (!loading) {
+      if (!error) {
+        setRockets(data.rockets);
+      }
+    }
+  }, [data, loading, error]);
+
+  useEffect(() => {
+    const countries = selectedFilters.filter(
+      (selectedFilter) => selectedFilter.title === "Country"
+    )[0].data;
+    const companies = selectedFilters.filter(
+      (selectedFilter) => selectedFilter.title === "Company"
+    )[0].data;
+
+    const filteredRockets = rockets
+      .filter((rocket) =>
+        countries.length ? countries.includes(rocket.country) : rocket
+      )
+      .filter((rocket) =>
+        companies.length ? companies.includes(rocket.company) : rocket
+      );
+
+    setRockets(filteredRockets);
+  }, [selectedFilters]);
 
   if (loading) {
     return <Text>Loading....</Text>;
@@ -43,20 +71,12 @@ const Home = ({ navigation }: HomeProps) => {
     return <Text>Error!!!</Text>;
   }
 
-  //   const handleRocketFilter = (name) => {
-  //     const filteredRockets = data.rockets.filter(
-  //       (rocket) => rocket.name === name
-  //     );
-  //     console.log(filteredRockets);
-  //   };
-
   return (
     <View>
       {/* <TextInput
         onChangeText={onChangeText}
         placeholder="Type here to translate!"
       /> */}
-      {/* <Button title="Press me" onPress={() => handleRocketFilter("Falcon 1")} /> */}
 
       <Button
         title="Filter"
@@ -87,7 +107,7 @@ const Home = ({ navigation }: HomeProps) => {
         ))}
 
       <Text>{"\n"}</Text>
-      {data.rockets.map((rocket) => (
+      {rockets.map((rocket) => (
         <View key={rocket.id}>
           <Pressable
             onPress={() => navigation.navigate("Detail", { id: rocket.id })}
@@ -96,6 +116,7 @@ const Home = ({ navigation }: HomeProps) => {
           </Pressable>
 
           <Text>Company: {rocket.company}</Text>
+          <Text>Country: {rocket.country}</Text>
           <Text>{"\n"}</Text>
         </View>
       ))}
