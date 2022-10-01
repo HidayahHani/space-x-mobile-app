@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, Pressable, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Alert,
+  TextInput,
+  ScrollView,
+  StyleSheet,
+  StatusBar,
+} from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
-import { useQuery } from "@apollo/client";
-import { GET_ROCKETS } from "../../gql/Query";
+import { useQuery, useLazyQuery } from "@apollo/client";
+import { GET_ROCKETS, GET_ROCKET } from "../../gql/Query";
 import { FilterList } from "../../components";
+import { Button } from "@rneui/themed";
 
 type RootStackParamList = {
   Home: undefined;
@@ -14,6 +24,7 @@ type HomeProps = StackScreenProps<RootStackParamList, "Home">;
 
 const Home = ({ navigation }: HomeProps) => {
   const [rockets, setRockets] = useState([]);
+  const [id, setId] = useState("");
   const [isRenderFilters, setIsRenderFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState([
     {
@@ -27,6 +38,11 @@ const Home = ({ navigation }: HomeProps) => {
   ]);
 
   const { data, error, loading } = useQuery(GET_ROCKETS);
+  const { searchData, searchLoading, searchError } = useQuery(GET_ROCKET, {
+    variables: { id },
+  });
+  console.log(id);
+  // const [id, setId] = useState("");
 
   useEffect(() => {
     console.log("home screen reloads");
@@ -78,56 +94,85 @@ const Home = ({ navigation }: HomeProps) => {
 
   return (
     <View>
-      {/* <TextInput
-        onChangeText={onChangeText}
-        placeholder="Type here to translate!"
-      /> */}
-
-      <Button
-        title="Filter"
-        onPress={() => setIsRenderFilters(!isRenderFilters)}
-      />
-      {isRenderFilters && (
-        <FilterList
-          selectedFilters={selectedFilters}
-          setSelectedFilters={setSelectedFilters}
+      <ScrollView style={styles.scrollView}>
+        <TextInput
+          placeholder="Enter the ID"
+          onChangeText={(id) => setId(id)}
         />
-      )}
+        {/* <Button title="Search" onPress={() => setId(id)} /> */}
 
-      <Text>{"\n"}</Text>
+        <View
+          style={{
+            marginTop: 10,
+            width: "20%",
+            height: 28,
+            backgroundColor: "white",
+          }}
+        >
+          <Button
+            size="sm"
+            type="outline"
+            title="Filter"
+            onPress={() => setIsRenderFilters(!isRenderFilters)}
+          />
+        </View>
 
-      {selectedFilters
-        .map((selectedFilter) =>
-          selectedFilter.data.length !== 0
-            ? selectedFilter.data.map(
-                (item) => `${selectedFilter.title}: ${item}`
-              )
-            : null
-        )
-        .flat()
-        .map((label) => (
-          <Pressable>
-            <Text>{label}</Text>
-          </Pressable>
-        ))}
+        {isRenderFilters && (
+          <FilterList
+            selectedFilters={selectedFilters}
+            setSelectedFilters={setSelectedFilters}
+          />
+        )}
 
-      <Text>{"\n"}</Text>
-      {rockets &&
-        rockets.map((rocket) => (
-          <View key={rocket.id}>
-            <Pressable
-              onPress={() => navigation.navigate("Detail", { id: rocket.id })}
-            >
-              <Text>Name: {rocket.name}</Text>
+        <Text>{"\n"}</Text>
+
+        {selectedFilters
+          .map((selectedFilter) =>
+            selectedFilter.data.length !== 0
+              ? selectedFilter.data.map(
+                  (item) => `${selectedFilter.title}: ${item}`
+                )
+              : null
+          )
+          .flat()
+          .map((label) => (
+            <Pressable>
+              <Text>{label}</Text>
             </Pressable>
+          ))}
 
-            <Text>Company: {rocket.company}</Text>
-            <Text>Country: {rocket.country}</Text>
-            <Text>{"\n"}</Text>
-          </View>
-        ))}
+        <Text>{"\n"}</Text>
+        {rockets &&
+          rockets.map((rocket) => (
+            <View key={rocket.id}>
+              <Pressable
+                onPress={() => navigation.navigate("Detail", { id: rocket.id })}
+              >
+                <Text>Name: {rocket.name}</Text>
+              </Pressable>
+
+              <Text>Company: {rocket.company}</Text>
+              <Text>Country: {rocket.country}</Text>
+              <Text>{"\n"}</Text>
+            </View>
+          ))}
+      </ScrollView>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: StatusBar.currentHeight,
+  },
+  scrollView: {
+    backgroundColor: "pink",
+    marginHorizontal: 5,
+  },
+  text: {
+    fontSize: 42,
+  },
+});
 
 export default Home;

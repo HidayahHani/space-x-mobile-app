@@ -5,7 +5,7 @@ import { SectionList, View, Pressable, Text } from "react-native";
 const FILTER_DATA = [
   {
     title: "Country",
-    data: ["United States", "Republic of the Marshall Islands", "UK", "Rusa"],
+    data: ["United States", "Republic of the Marshall Islands", "UK", "Russia"],
   },
   {
     title: "Company",
